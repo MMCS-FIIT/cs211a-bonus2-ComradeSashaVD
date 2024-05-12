@@ -1,6 +1,15 @@
 ﻿using System.Reflection.Metadata.Ecma335;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Console;
+
 
 namespace SimpleTGBot;
+
+using System.Reflection;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -10,7 +19,7 @@ using Telegram.Bot.Types.Enums;
 public class TelegramBot
 {
     // Токен TG-бота. Можно получить у @BotFather
-    private const string BotToken = "ВАШ_ТОКЕН_ИДЕНТИФИКАЦИИ_БОТА";
+    private const string BotToken = "6849471329:AAH_8gdi5j9YpvKGvqTucEYj-PJEoEDH0NA";
     
     /// <summary>
     /// Инициализирует и обеспечивает работу бота до нажатия клавиши Esc
@@ -20,7 +29,8 @@ public class TelegramBot
         // Если вам нужно хранить какие-то данные во время работы бота (массив информации, логи бота,
         // историю сообщений для каждого пользователя), то это всё надо инициализировать в этом методе.
         // TODO: Инициализация необходимых полей
-        
+        var path = "Цитаты.txt";
+        string[] massiveQuote = System.IO.File.ReadAllLines(path);
         // Инициализируем наш клиент, передавая ему токен.
         var botClient = new TelegramBotClient(BotToken);
         
@@ -84,12 +94,36 @@ public class TelegramBot
         Console.WriteLine($"Получено сообщение в чате {chatId}: '{messageText}'");
 
         // TODO: Обработка пришедших сообщений
-        
-        // Отправляем обратно то же сообщение, что и получили
-        Message sentMessage = await botClient.SendTextMessageAsync(
-            chatId: chatId,
-            text: "Ты написал:\n" + messageText,
-            cancellationToken: cancellationToken);
+
+        if ((messageText == "моя цитата") || (messageText == "моя цитата.")  || (messageText == "моя цитата .") || (messageText == "моя цитата!") ||
+            (messageText == "моя цитата !") || (messageText == "Моя цитата")  || (messageText == "Моя цитата.")  || (messageText == "Моя цитата .") ||
+            (messageText == "Моя цитата!") || (messageText == "Моя цитата !") || 
+            (messageText == "Бот, моя цитата!") || (messageText == "Бот, моя цитата") || (messageText == "Бот, моя цитата.") ||
+            (messageText == "Бот моя цитата!") || (messageText == "Бот моя цитата") || (messageText == "Бот моя цитата.") ||
+            (messageText == "бот, моя цитата!") || (messageText == "бот, моя цитата") || (messageText == "бот, моя цитата.") ||
+            (messageText == "бот моя цитата!") || (messageText == "бот моя цитата") || (messageText == "бот моя цитата."))
+        {
+            var path = "Цитаты.txt";
+            string[] massiveQuote = System.IO.File.ReadAllLines(path);
+            Random rnd = new Random();
+            int index = rnd.Next(0, massiveQuote.Length);
+            WriteLine(massiveQuote[index]);
+
+
+            // Отправляем сообщение с цитатой
+            Message sentMessage = await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: massiveQuote[index],
+                cancellationToken: cancellationToken);
+        } 
+        else
+        {
+            // Отправляем сообщение с просьбой о корректном вводе
+            Message sentMessage = await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "Извините, но я Вас не понимаю, пожалуйста, напишите \"бот, моя цитата\", или \"бот моя цитата\", или просто \"моя цитата\", если Вы хотите получить в ответ цитату из аниме \"Врата Штейна\". Спасибо за понимание! ",
+                cancellationToken: cancellationToken);
+        }
     }
 
     /// <summary>
